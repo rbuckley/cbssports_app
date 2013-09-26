@@ -4,20 +4,15 @@ import json
 
 from flask import request
 
-from app import app
+from app import app, api
 
 @app.route('/')
 def index():
-    access_token = request.args.get('access_token')
-    sport = request.args.get('SPORT')
-    user_id = request.args.get('user_id')
-    league_id = request.args.get('league_id')
+    if api.access_token is None:
+        api.set_access_token(request.args.get('access_token'))
 
+    league_details = api.league.details()
 
-    print access_token
-    print sport
-    print user_id
-    print league_id
-    r = requests.get('http://api.cbssports.com/fantasy/league/teams?version=2.0&request_format=JSON')
-    r.json()
+    print league_details
+
     return "Welcome to my cbssports app"
