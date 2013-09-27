@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+<form method="POST" action=".">
+    {{form.csrf_token}}
+    {{form.players}}
+    <input type="submit" value="Go">
+</form>
+{% endblock %}

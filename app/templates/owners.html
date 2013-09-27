@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<p>
+    {% if owners %}
+        {% for owner in owners %}
+        <table>
+            <tr valign="top">
+                <td>{{ owner['logo'] }}</td><td><a href="{{ url_for('.dossier', id = owner['id']) }}">{{ owner['name'] }}</a></td>
+            </tr>
+        </table>
+        {% endfor %}
+    {% endif %}
+</p>
+{% endblock %} 

@@ -5,7 +5,8 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from cbssports import API
 
 app = Flask(__name__)
+app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
-api = API('JSON')
+api = API()
 
 from app import views, models

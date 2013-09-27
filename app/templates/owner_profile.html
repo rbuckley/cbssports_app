@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ owner['name'] }}</h1>
+<hr>
+{% from "macros.html" import render_field %}
+<form method="POST" action="">
+    <p>
+    Write a note about this owner: <br>
+    {{ form.csrf_token }}
+    {{ render_field(form.title, size=50, class="input text") }}<br>
+    {{ render_field(form.new_entry, class="input text") }}
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}
