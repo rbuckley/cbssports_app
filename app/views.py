@@ -29,8 +29,11 @@ def dossier(id=None):
 
     form = DossierTextField(request.form)
     if form.validate_on_submit():
-        print 'gotta do something with teh data'
         print form.new_entry.data
+        # do something with the data here
+        # before we clear it
+        form.new_entry.data = ''
+        form.title.data = ''
 
     owners = api.league.owners()
 
@@ -44,6 +47,5 @@ def dossier(id=None):
 @app.route('/dossier/', methods=['GET', 'POST'])
 def home():
     owners = api.league.owners()
-
 
     return render_template('owners.html', owners=owners['owners'])
