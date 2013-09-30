@@ -3,12 +3,31 @@ from flask import request, render_template
 from app import app, api
 from app.forms import PlayerSelector, DossierTextField
 
-
+from app import db, models
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if api.access_token is None:
         api.set_access_token(request.args.get('access_token'))
+
+    user_id = request.args.get('user_id')
+    league_id = request.args.get('league_id')
+
+    u = models.User.query.filter_by(api_user_id=user_id).first()
+    #u = models.User.query.get(user_id)
+    if u is None:
+        # need to create a new user
+        # get the JSON object from the API
+        owners = api.fantasy_league.owners()['owners']
+        for x in owners:
+            if 'logged_in_owner' in x:
+                owner = x
+
+        new_user = models.User(user_id, owner['name'])
+        db.session.add(new_user)
+        db.sessions.commit()
+    else:
+        return 'Welcome back ' + u.name
 
     players = api.players.list()
 
@@ -35,9 +54,9 @@ def dossier(id=None):
         form.new_entry.data = ''
         form.title.data = ''
 
-    owners = api.league.owners()
+    owners = api.league.owners()['owners']
 
-    for x in owners['owners']:
+    for x in owners:
         if x['id'] == id:
             owner = x
 
