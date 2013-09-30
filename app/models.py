@@ -19,8 +19,12 @@ class Dossier(db.Model):
     __tablename__ = 'dossiers'
     id = db.Column(db.Integer, primary_key=True)
     league_id = db.Column(db.String)
-    owner_pages = db.relationship('Page', backref='dossier', lazy='dynamic')
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    owner_pages = db.relationship('Page', backref='dossier', lazy='dynamic')
+
+    def __init__(self, league_id, user_id):
+        self.league_id = league_id
+        self.user_id = user_id
 
 
 class Page(db.Model):
@@ -32,6 +36,15 @@ class Page(db.Model):
         entries:
             Blog post type blurbs about anything
 
+        dossier_id:
+            Reference back up to the dossier table
+
+        owner_id:
+            The CBS id for this owner as returned by the api
+
+        team_id:
+            The CBS is for this team as returned by the api
+
         loves:
             List of player ids we think this owner loves
 
@@ -41,9 +54,16 @@ class Page(db.Model):
     __tablename__ = 'pages'
     id = db.Column(db.Integer, primary_key=True)
     entries = db.relationship('Entry', backref='dossier', lazy='dynamic')
+    owner_id = db.Column(db.String(36))
+    team_id = db.Column(db.Integer)
     dossier_id = db.Column(db.Integer, db.ForeignKey('dossiers.id'))
     loves = db.Column(db.Text)
     hates = db.Column(db.Text)
+
+    def __init__(self, dossier_id, owner_id, team_id):
+        self.dossier_id = dossier_id
+        self.owner_id = owner_id
+        self.team_id = team_id
 
 
 class Entry(db.Model):

@@ -22,10 +22,7 @@ def index():
         for x in owners:
             if 'logged_in_owner' in x:
                 owner = x
-
-        new_user = models.User(user_id, owner['name'])
-        db.session.add(new_user)
-        db.session.commit()
+        create_new_user(owner, user_id, league_id)
 
     players = api.players.list()
 
@@ -34,7 +31,8 @@ def index():
         for p in selector.players.data:
             print api.players.search(player_id=p)
 
-    selector.players.choices = [(p['id'], p['fullname']) for p in players['players']]
+    selector.players.choices = [(p['id'], p['fullname'])
+                                for p in players['players']]
 
     return render_template('selector.html', form=selector)
 
@@ -66,3 +64,28 @@ def home():
     owners = api.league.owners()
 
     return render_template('owners.html', owners=owners['owners'])
+
+
+def create_new_user(owner, user_id, league_id):
+
+    new_user = models.User(user_id, owner['name'])
+    db.session.add(new_user)
+    db.session.commit()
+
+    # create the Dossier object for this league
+    dossier = models.Dossier(league_id, new_user.id)
+
+    db.session.add(dossier)
+    db.session.commit()
+    print 'created new dossier[%s] for league %s' % (dossier.id, dossier.league_id)
+    # get the list of owners not us
+    owners = [x for x in api.league.owners()['owners']
+              if 'logged_in_owner' not in x]
+
+    # create the initial page for each rival owner
+    for owner in owners:
+        print 'adding new page for %s[%s]' % (owner['name'], owner['id'])
+        db.session.add(models.Page(
+            dossier.id, owner['id'], owner['team']['id']))
+
+    db.session.commit()
