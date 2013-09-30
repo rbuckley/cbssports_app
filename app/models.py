@@ -6,10 +6,9 @@ from app import db
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    api_user_id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String(30))
     api_id = db.Column(db.String(36), unique=True)
-    dossiers = db.relationship('Dossier')
+    dossiers = db.relationship('Dossier', backref='user', lazy='dynamic')
 
     def __init__(self, api_id, name):
         self.api_id = api_id
@@ -20,7 +19,7 @@ class Dossier(db.Model):
     __tablename__ = 'dossiers'
     id = db.Column(db.Integer, primary_key=True)
     league_id = db.Column(db.String)
-    owner_pages = db.relationship('Page')
+    owner_pages = db.relationship('Page', backref='dossier', lazy='dynamic')
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
@@ -41,7 +40,7 @@ class Page(db.Model):
     """
     __tablename__ = 'pages'
     id = db.Column(db.Integer, primary_key=True)
-    entries = db.relationship('Entry')
+    entries = db.relationship('Entry', backref='dossier', lazy='dynamic')
     dossier_id = db.Column(db.Integer, db.ForeignKey('dossiers.id'))
     loves = db.Column(db.Text)
     hates = db.Column(db.Text)

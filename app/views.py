@@ -13,21 +13,19 @@ def index():
     user_id = request.args.get('user_id')
     league_id = request.args.get('league_id')
 
-    u = models.User.query.filter_by(api_user_id=user_id).first()
+    u = models.User.query.filter_by(api_id=user_id).first()
     #u = models.User.query.get(user_id)
     if u is None:
         # need to create a new user
         # get the JSON object from the API
-        owners = api.fantasy_league.owners()['owners']
+        owners = api.league.owners()['owners']
         for x in owners:
             if 'logged_in_owner' in x:
                 owner = x
 
         new_user = models.User(user_id, owner['name'])
         db.session.add(new_user)
-        db.sessions.commit()
-    else:
-        return 'Welcome back ' + u.name
+        db.session.commit()
 
     players = api.players.list()
 
