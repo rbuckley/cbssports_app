@@ -1,9 +1,10 @@
 #!/usr/bin/env python
+
 from flask import request, render_template
-from app import app, api
+from app import app, api, db, models
 from app.forms import PlayerSelector, DossierTextField
 
-from app import db, models
+from app.session import Session
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -12,18 +13,11 @@ def index():
     user_id = request.args.get('user_id')
     league_id = request.args.get('league_id')
 
-    u = models.User.query.filter_by(api_id=user_id).first()
-    #u = models.User.query.get(user_id)
-    if u is None:
-        # need to create a new user
-        # get the JSON object from the API
-        owners = api.league.owners()['owners']
-        for x in owners:
-            if 'logged_in_owner' in x:
-                owner = x
-        create_new_user(owner, user_id, league_id)
-    elif u.dossiers.filter_by(league_id=league_id).first() is None:
-        create_new_dossier(league_id, u.id)
+    # this will create the session we can use for the
+    # remainder of the time the user is logged in
+    # it provides methods for getting anything out
+    # of the database
+    dossier_sesh = Session(user_id, league_id)
 
     players = api.players.list()
 
@@ -52,7 +46,8 @@ def dossier(id=None):
     if form.validate_on_submit():
         # do something with the data here
         # before we clear it
-        new_page = models.Entry(owner_page.id, form.title.data, form.new_entry.data)
+        new_page = models.Entry(owner_page.id,
+                                form.title.data, form.new_entry.data)
         db.session.add(new_page)
         db.session.commit()
         form.new_entry.data = ''
@@ -71,33 +66,3 @@ def home():
               if 'logged_in_owner' not in x]
 
     return render_template('owners.html', owners=owners)
-
-
-def create_new_user(owner, user_id, league_id):
-
-    new_user = models.User(user_id, owner['name'])
-    db.session.add(new_user)
-    db.session.commit()
-
-    dossier = create_new_dossier(league_id, new_user.id)
-
-    return new_user
-
-
-def create_new_dossier(league_id, user_id):
-    dossier = models.Dossier(league_id, user_id)
-    db.session.add(dossier)
-    db.session.commit()
-
-    # get the list of owners not us
-    owners = [x for x in api.league.owners()['owners']
-              if 'logged_in_owner' not in x]
-
-    # create the initial page for each rival owner
-    for owner in owners:
-        db.session.add(models.Page(
-            dossier.id, owner['id'], owner['team']['id']))
-
-    db.session.commit()
-
-    return dossier
