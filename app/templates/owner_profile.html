@@ -11,4 +11,10 @@
     {{ render_field(form.new_entry, class="input text") }}
     <input type="submit" value="Submit">
 </form>
+<hr>
+<h2>Existing Entries:</h2>
+{% for entry in entries %}
+<i>{{ entry.title }}</i><br>
+{{ entry.body }}<br>
+{% endfor %}
 {% endblock %}

@@ -72,3 +72,8 @@ class Entry(db.Model):
     page_id = db.Column(db.Integer, db.ForeignKey('pages.id'))
     title = db.Column(db.String(80))
     body = db.Column(db.Text)
+
+    def __init__(self, page_id, title, body):
+        self.page_id = page_id
+        self.title = title
+        self.body = body
