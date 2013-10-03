@@ -7,7 +7,11 @@ import os, sys
 
 sys.path.append(os.getcwd())
 
-from app import app, db
+from app.models import *
+from app.core import db
+from app.api import create_app
+
+app = create_app()
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config

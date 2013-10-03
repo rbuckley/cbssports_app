@@ -4,5 +4,5 @@ from ..core import Service
 from .models import User
 
 
-class UsersServce(Service):
+class UsersService(Service):
     __model__ = User

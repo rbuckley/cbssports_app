@@ -4,20 +4,12 @@ from flask import request, render_template
 from app import app, api, db, models
 from app.forms import PlayerSelector, DossierTextField
 
-from app.session import Session
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
     api.set_access_token(request.args.get('access_token'))
 
     user_id = request.args.get('user_id')
     league_id = request.args.get('league_id')
-
-    # this will create the session we can use for the
-    # remainder of the time the user is logged in
-    # it provides methods for getting anything out
-    # of the database
-    dossier_sesh = Session(user_id, league_id)
 
     players = api.players.list()
 
@@ -46,6 +38,7 @@ def dossier(id=None):
     if form.validate_on_submit():
         # do something with the data here
         # before we clear it
+
         new_page = models.Entry(owner_page.id,
                                 form.title.data, form.new_entry.data)
         db.session.add(new_page)

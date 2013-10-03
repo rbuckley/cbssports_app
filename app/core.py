@@ -21,10 +21,10 @@ class Service(object):
         return kwargs
 
     def save(self, model):
-        self._isinstance(model)
-        db.session.add(model)
-        db.session.commit()
-        return model
+        if self._isinstance(model):
+            db.session.add(model)
+            db.session.commit()
+            return model
 
     def all(self):
         return self.__model__.query.all()
@@ -48,13 +48,13 @@ class Service(object):
         return self.save(self.new(**kwargs))
 
     def update(self, model, **kwargs):
-        self._isinstance(model)
-        for k, v in self._preprocess_params(kwargs).items():
-            setattr(model, k, v)
-        self.save(model)
-        return model
+        if self._isinstance(model):
+            for k, v in self._preprocess_params(kwargs).items():
+                setattr(model, k, v)
+            self.save(model)
+            return model
 
     def delete(self, model):
-        self._isinstance(model)
-        db.session.delete(model)
-        db.session.commit()
+        if self._isinstance(model):
+            db.session.delete(model)
+            db.session.commit()

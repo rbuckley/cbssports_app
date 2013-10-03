@@ -7,7 +7,7 @@ class Dossier(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     league_id = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    owner_pages = db.relationship('Page', backref='dossier', lazy='dynamic')
+    owner_pages = db.relationship('Page', cascade='all, delete', backref='dossier', lazy='dynamic')
 
     def __init__(self, league_id, user_id):
         self.league_id = league_id
@@ -40,7 +40,7 @@ class Page(db.Model):
     """
     __tablename__ = 'pages'
     id = db.Column(db.Integer, primary_key=True)
-    entries = db.relationship('Entry', backref='dossier', lazy='dynamic')
+    entries = db.relationship('Entry', cascade='all, delete', backref='dossier', lazy='dynamic')
     owner_id = db.Column(db.String(36))
     team_id = db.Column(db.Integer)
     dossier_id = db.Column(db.Integer, db.ForeignKey('dossiers.id'))
