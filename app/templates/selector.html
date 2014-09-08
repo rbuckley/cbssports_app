@@ -1,8 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
 <form method="POST" action=".">
-    {{form.csrf_token}}
-    {{form.players}}
-    <input type="submit" value="Go">
+   {{form.csrf_token}}
+   {{form.players}}
+   <input type="submit" value="Go">
 </form>
+{% if selected_players %}
+{% from "macros.html" import render_player %}
+<div id="selected_players">
+   <table style="width:100%">
+      {% for player in selected_players %}
+         {{ render_player(player) }}
+      {% endfor %}
+   </table>
+</div>
+{% endif %}
 {% endblock %}

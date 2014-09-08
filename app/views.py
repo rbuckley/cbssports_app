@@ -4,24 +4,27 @@ from flask import request, render_template
 from app import app, api, db, models
 from app.forms import PlayerSelector, DossierTextField
 
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    api.set_access_token(request.args.get('access_token'))
-
-    user_id = request.args.get('user_id')
-    league_id = request.args.get('league_id')
+    if api.access_token is None:
+        api.set_access_token(request.args.get('access_token'))
 
     players = api.players.list()
 
+    selected_players = []
     selector = PlayerSelector(request.form)
     if selector.is_submitted():
         for p in selector.players.data:
-            print api.players.search(player_id=p)
+            selected_players += api.players.search(player_id=p)['players']
+            print api.general.stats(player_id=p, timeframe='2014', period='season')
+            print api.league.fantasy__points(player_id=p, timeframe='2014', period='season')
 
     selector.players.choices = [(p['id'], p['fullname'])
                                 for p in players['players']]
 
-    return render_template('selector.html', form=selector)
+    return render_template('selector.html', form=selector,
+                           selected_players=selected_players)
 
 
 @app.route('/dossier/<id>', methods=['GET', 'POST'])
@@ -59,3 +62,8 @@ def home():
               if 'logged_in_owner' not in x]
 
     return render_template('owners.html', owners=owners)
+
+
+@app.route('/teams/', methods=['GET', 'POST'])
+def teams():
+    return render_template('base.html')
