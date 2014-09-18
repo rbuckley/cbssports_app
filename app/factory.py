@@ -2,7 +2,6 @@
 
 from flask import Flask
 from core import db
-from .helpers import register_blueprints
 
 
 def init_extensions(app):
@@ -15,7 +14,5 @@ def create_app(package_name, package_path):
     app.config.from_object('app.config')
 
     init_extensions(app)
-
-    register_blueprints(app, package_name, package_path)
 
     return app

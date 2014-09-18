@@ -9,6 +9,10 @@ from app.forms import PlayerSelector, DossierTextField
 def index():
     if api.access_token is None:
         api.set_access_token(request.args.get('access_token'))
+    return render_template('base.html')
+
+@app.route('/report', methods=['GET', 'POST'])
+def advReport():
 
     players = api.players.list()
 
@@ -28,9 +32,8 @@ def index():
 
 
 @app.route('/dossier/<id>', methods=['GET', 'POST'])
-def dossier(id=None):
+def individualDossier(id=None):
     owners = api.league.owners()['owners']
-
     for x in owners:
         if x['id'] == id:
             owner = x
@@ -57,7 +60,7 @@ def dossier(id=None):
 
 
 @app.route('/dossier/', methods=['GET', 'POST'])
-def home():
+def dossiers():
     owners = [x for x in api.league.owners()['owners']
               if 'logged_in_owner' not in x]
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from flask import Blueprint, request
+from flask import Blueprint
 
 bp = Blueprint('dossiers', __name__, url_prefix='/dossier')
 

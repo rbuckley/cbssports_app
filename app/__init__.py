@@ -9,4 +9,4 @@ app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
 api = API()
 
-from app import views, models
+from . import views, models
